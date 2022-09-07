@@ -1,7 +1,6 @@
 import numpy as np
 #import mpi4py.MPI as mpi
 
-from datetime import datetime, timedelta
 from time import time
 import h5py
 import os
@@ -21,7 +20,7 @@ def progress_bar(current, total, bar_length=20):
 
     print(f'Progress: [{arrow}{padding}] {int(fraction*100)}%', end=ending)
 
-def main(N = 100, R = 2.5, dt = 0.0001, itmax = 100, OPL = 0, SAVE = 1, SILENT = 0):
+def main(N = 100, R = 2.5, dt = 0.0001, itmax = 100, OPL = 1, SAVE = 1, SILENT = 0):
 	
     if SAVE:
 	    name = f'N{N}_R{R}_t{itmax}.h5'
@@ -69,42 +68,42 @@ def main(N = 100, R = 2.5, dt = 0.0001, itmax = 100, OPL = 0, SAVE = 1, SILENT =
             print(f'Saving to {name}.')
         h5f.create_dataset(f'Horizon', data=horizons, compression = 9)
         h5f.close()
-        #comm = f'/mnt/c/"Program Files"/Google/Chrome/Application/chrome.exe http://127.0.0.1:8880/ & python3 DashPlots.py {name} {N} {itmax} {fields.dR}'   
-        #os.system(comm)
+        comm = f'/mnt/c/"Program Files"/Google/Chrome/Application/chrome.exe http://127.0.0.1:8880/ & python3 DashPlots.py {name} {fields.N} {itmax} {fields.dR}'   
+        os.system(comm)
     if not SILENT:
         print('')
         
 if __name__ == "__main__":
-#    params = {
-#        'points'   : 100,
-#        'radius'   : 2.5,
-#        'time_step': 0.0001,
-#        'iter'     : 100,
-#        'oplslic'  : 0,
-#        'savevar'  : 1,
-#        'silentvar': 0
-#    }
-#    
-#    parser = argparse.ArgumentParser()
-#    parser.add_argument('-N', '--points', help = 'Number of points', type = int)
-#    parser.add_argument('-R','--radius', help = 'Length of simulation domain', type = float)
-#    parser.add_argument('-dt','--time-step', help = 'Time step to employ', type = float)
-#    parser.add_argument('-it','--iter', help = 'Number of time iterations', type = int)
-#    parser.add_argument('-OPL','--oplslic', help = '1 to apply 1+Log Slicing conditions, 0 to apply Geodesic Slicing conditions', type = int)
-#    parser.add_argument('-SAVE','--savevar', help = '1 to save the output in an .h5 file, 0 otherwise', type = int)
-#    parser.add_argument('-SILENT','--silentvar', help = '1 to suppress text output, 0 otherwise', type = int)
-#    
-#    args = parser.parse_args()
-#    for arg in vars(args):
-#        if getattr(args, arg) is not None:
-#            params[arg] = getattr(args, arg)
-#
-#    ## This first run is needed to compile Numba
-#    main(N = 10, itmax = 3, SAVE = 0, SILENT = 1)
-#    
-#    main(*list(params.values()))
+    params = {
+        'points'   : 100,
+        'radius'   : 2.5,
+        'time_step': 0.0001,
+        'iter'     : 100,
+        'oplslic'  : 1,
+        'savevar'  : 1,
+        'silentvar': 0
+    }
+    
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-N', '--points', help = 'Number of points', type = int)
+    parser.add_argument('-R','--radius', help = 'Length of simulation domain', type = float)
+    parser.add_argument('-dt','--time-step', help = 'Time step to employ', type = float)
+    parser.add_argument('-it','--iter', help = 'Number of time iterations', type = int)
+    parser.add_argument('-OPL','--oplslic', help = '1 to apply 1+Log Slicing conditions, 0 to apply Geodesic Slicing conditions', type = int)
+    parser.add_argument('-SAVE','--savevar', help = '1 to save the output in an .h5 file, 0 otherwise', type = int)
+    parser.add_argument('-SILENT','--silentvar', help = '1 to suppress text output, 0 otherwise', type = int)
+    
+    args = parser.parse_args()
+    for arg in vars(args):
+        if getattr(args, arg) is not None:
+            params[arg] = getattr(args, arg)
+
+    ## This first run is needed to compile Numba
+    #main(N = 10, itmax = 3, SAVE = 0, SILENT = 1)
+    
+    main(*list(params.values()))
 
 
 
-    for n in [100,200,300,400,500,600]:
-        main(N=n, itmax=200)
+#    for n in [100,200,300,400,500,600]:
+#        main(N=n, itmax=200)

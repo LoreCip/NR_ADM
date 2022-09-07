@@ -6,12 +6,10 @@ from scipy.optimize import fsolve
 
 from RK4 import der_r
 
-@njit
 def func(A, B, KB, r, N, dR):
-    dB = np.zeros(N)
-    for i in range(N):
+    dB = np.zeros(N-1)
+    for i in range(N-1):
         dB[i] = der_r(B, i, dR)
-    
     return (2 / r + dB / B) / np.sqrt(A) - 2 * KB
 
 @njit
@@ -27,10 +25,10 @@ def find_sgn_change(function, N):
 
 def comp_appHorizon(fields):
     
-    A = fields.A() * fields.psi**4
-    B = fields.B() * fields.psi**4
+    A = fields.A()[1:] * fields.psi**4
+    B = fields.B()[1:] * fields.psi**4
     
-    function = func(A, B, fields.KB(), fields.r, fields.N, fields.dR)
+    function = func(A, B, fields.KB()[1:], fields.r, fields.N, fields.dR)
     
     i = find_sgn_change(function, fields.N)
     

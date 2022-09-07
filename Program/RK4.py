@@ -1,8 +1,7 @@
 import numpy as np
-from EFE_TR import *
+from scipy.interpolate import interp1d
 
-def extrapolate(x_2, y_2, x_1, y_1, x_ex):
-    return y_2 + (y_1 - y_2) * (x_ex - x_2) / (x_1 - x_2)
+from EFE_TR import *
 
 def eulerStep(fields, dt, k, fac):
     fields_dict = {
@@ -16,7 +15,7 @@ def eulerStep(fields, dt, k, fac):
     for f in range(7):
         init = f*fields.N
         fin  = (f+1)*fields.N
-		# (A)symmetry condition
+		# (A)symmetry condition (ghosts)
         if f == 2 or f == 3:
             results[init] = - fields_dict[f]()[1]
         else:
@@ -24,8 +23,9 @@ def eulerStep(fields, dt, k, fac):
 		# Central part
         results[init+1:fin-1] = fields_dict[f]()[1:-1] + k[init+1:fin-1] * fac * dt
         # Boundary extrapolation
-        results[fin-1] = extrapolate(fields.r[-3], results[fin - 3], fields.r[-2], results[fin - 2], fields.r[-1])
-    
+        #ite = interp1d([fields.r[-3], fields.r[-2]], [results[fin-3], results[fin-2]], fill_value='extrapolate')
+        #results[fin-1] = ite(fields.r[-1])
+        results[fin-1] = 0 if f == 2 or f == 3 else 1
     return results
 
 def RHS(f0, r, dr, N, OPL):
@@ -37,7 +37,7 @@ def RHS(f0, r, dr, N, OPL):
             }
     rhs = np.zeros(7 * N)
     for f in range(7):
-        for i in range(1,N-1):
+        for i in range(1,N-1): # Salto il ghost e l'ultimo, che è estrapolato
             rhs[N * f + i] = func_dict[f](f0, i, r, dr, N, OPL)
     return rhs
 
@@ -57,6 +57,7 @@ def rk4(fields, dt):
          else:
              out[init] =   out[init+1]
         # Boundary extrapolation
-         out[fin-1] = extrapolate(fields.r[-3], out[fin - 3], fields.r[-2], out[fin - 2], fields.r[-1])
-		
+         #ite = interp1d([fields.r[-3], fields.r[-2]], [out[fin-3], out[fin-2]], fill_value='extrapolate')
+         #out[fin-1] = ite(fields.r[-1])
+         out[fin-1] = 0 if f == 2 or f == 3 else 1
     return out

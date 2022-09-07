@@ -7,13 +7,13 @@ class Fields():
     def __init__(self, R = 10, N = 110):
         # Domain is a sphere of radius R
         self.Rmax = R
-        self.N    = N
+        self.N    = N + 1 # 1 is the ghost cell
         
         self.dR  = R / N
     
         self.r = np.array([(j - 0.5)*self.dR for j in range(1,N+1)], dtype = np.float64)
         
-        self.fields = np.zeros(7 * N)
+        self.fields = np.zeros(7 * self.N)
         
         self.psi = 1 + 1 / 4 / self.r  #r_s = 1
         self.OPL = False
