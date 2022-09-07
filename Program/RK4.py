@@ -15,17 +15,20 @@ def eulerStep(fields, dt, k, fac):
     for f in range(7):
         init = f*fields.N
         fin  = (f+1)*fields.N
-		# (A)symmetry condition (ghosts)
-        if f == 2 or f == 3:
-            results[init] = - fields_dict[f]()[1]
-        else:
-            results[init] = fields_dict[f]()[1]
+        
 		# Central part
-        results[init+1:fin-1] = fields_dict[f]()[1:-1] + k[init+1:fin-1] * fac * dt
+        results[init+2:fin-1] = fields_dict[f]()[2:-1] + k[init+2:fin-1] * fac * dt
+        # (A)symmetry condition (ghosts) TRUE????
+        if f == 2 or f == 3:
+            results[init+1] = - results[init+2]
+            results[init]   = - results[init+3]
+        else:
+            results[init+1] =   results[init+2]
+            results[init]   =   results[init+3]
+        
         # Boundary extrapolation
-        #ite = interp1d([fields.r[-3], fields.r[-2]], [results[fin-3], results[fin-2]], fill_value='extrapolate')
-        #results[fin-1] = ite(fields.r[-1])
-        results[fin-1] = 0 if f == 2 or f == 3 else 1
+        ite = interp1d([fields.r[-3], fields.r[-2]], [results[fin-3], results[fin-2]], fill_value='extrapolate')
+        results[fin-1] = ite(fields.r[-1])
     return results
 
 def RHS(f0, r, dr, N, OPL):
@@ -37,15 +40,15 @@ def RHS(f0, r, dr, N, OPL):
             }
     rhs = np.zeros(7 * N)
     for f in range(7):
-        for i in range(1,N-1): # Salto il ghost e l'ultimo, che è estrapolato
+        for i in range(2,N-1): # Salto i 2 ghosts e l'ultimo, che è estrapolato
             rhs[N * f + i] = func_dict[f](f0, i, r, dr, N, OPL)
     return rhs
 
 def rk4(fields, dt):
     k1 = RHS(fields.fields, fields.r, fields.dR, fields.N, fields.OPL)
-    k2 = RHS(eulerStep(fields, dt, k1, 0.5), fields.r, fields.dR, fields.N, fields.OPL)     # t0 + 0.5 * dt
-    k3 = RHS(eulerStep(fields, dt, k2, 0.5), fields.r, fields.dR, fields.N, fields.OPL)     # t0 + 0.5 * dt
-    k4 = RHS(eulerStep(fields, dt, k3, 1  ), fields.r, fields.dR, fields.N, fields.OPL)     # t0 +  dt
+    k2 = RHS(eulerStep(fields, dt, k1, 0.5), fields.r, fields.dR, fields.N, fields.OPL)
+    k3 = RHS(eulerStep(fields, dt, k2, 0.5), fields.r, fields.dR, fields.N, fields.OPL)
+    k4 = RHS(eulerStep(fields, dt, k3, 1  ), fields.r, fields.dR, fields.N, fields.OPL)
     out = fields.fields + (k1/6 + k2/3 + k3/3 + k4/6) * dt / 2
 	
     for f in range(7):
@@ -53,11 +56,12 @@ def rk4(fields, dt):
          fin  = (f+1)*fields.N
         # (A)symmetry condition
          if f == 2 or f == 3:
-             out[init] = - out[init+1]
+            out[init+1] = - out[init+2]
+            out[init]   = - out[init+3]
          else:
-             out[init] =   out[init+1]
+            out[init+1] =   out[init+2]
+            out[init]   =   out[init+3]
         # Boundary extrapolation
-         #ite = interp1d([fields.r[-3], fields.r[-2]], [out[fin-3], out[fin-2]], fill_value='extrapolate')
-         #out[fin-1] = ite(fields.r[-1])
-         out[fin-1] = 0 if f == 2 or f == 3 else 1
+         ite = interp1d([fields.r[-3], fields.r[-2]], [out[fin-3], out[fin-2]], fill_value='extrapolate')
+         out[fin-1] = ite(fields.r[-1])
     return out

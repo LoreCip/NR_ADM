@@ -21,7 +21,7 @@ dR = float(sys.argv[4])
 r = np.array([(j - 0.5)*dR for j in range(1,N+1)], dtype = np.float64)
 
 dataH5 = h5py.File(name,'r')
-data = np.zeros((len(dataH5), 7, N))
+data = np.zeros((len(dataH5), 7, N-2))
 for i in range(tmax+1):
     data[i,:,:] = dataH5[f'{i}']
     

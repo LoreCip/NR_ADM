@@ -7,7 +7,8 @@ import os
 import argparse
 
 from FieldsClass import Fields
-from RK4 import rk4, der_r
+from RK4 import rk4
+from EFE_TR import ghost_derivative
 from Horizon import comp_appHorizon
 
 def progress_bar(current, total, bar_length=20):
@@ -42,37 +43,51 @@ def main(N = 100, R = 2.5, dt = 0.0001, itmax = 100, OPL = 1, SAVE = 1, SILENT =
     t_it = 0
     if not SILENT:
         print('Performing MoL evolution:')
+
     while j <= itmax:
         t1 = time()
         fields.fields = np.copy(rk4(fields, dt))
-        
         t += dt
         
         horizons[j,0] = t
         horizons[j,1], horizons[j,3] = comp_appHorizon(fields)
         horizons[j,2] = horizons[j,1] * (1 + 1/4/horizons[j,1])**2
         
-        t_it += time() - t1
         if SAVE:
             reshaped_output = np.reshape(fields.fields, (7, fields.N))
+            reshaped_output = np.delete(reshaped_output, [0,1], 1)
             h5f.create_dataset(f'{j}', data=reshaped_output, compression = 9)
             
+        t_it += time() - t1 
         j += 1
         if not SILENT:
             progress_bar(j, itmax)
         
     if not SILENT:    
         print(f'Simulation complete. Total elapsed time: {np.round(t_it,4)} s')
-    if SAVE:
+    
+    if SAVE:    
         if not SILENT:
             print(f'Saving to {name}.')
+        
         h5f.create_dataset(f'Horizon', data=horizons, compression = 9)
         h5f.close()
+        
         comm = f'/mnt/c/"Program Files"/Google/Chrome/Application/chrome.exe http://127.0.0.1:8880/ & python3 DashPlots.py {name} {fields.N} {itmax} {fields.dR}'   
         os.system(comm)
+        
     if not SILENT:
         print('')
         
+        
+    
+    
+
+    
+    
+    
+    
+    
 if __name__ == "__main__":
     params = {
         'points'   : 100,
@@ -102,8 +117,3 @@ if __name__ == "__main__":
     #main(N = 10, itmax = 3, SAVE = 0, SILENT = 1)
     
     main(*list(params.values()))
-
-
-
-#    for n in [100,200,300,400,500,600]:
-#        main(N=n, itmax=200)

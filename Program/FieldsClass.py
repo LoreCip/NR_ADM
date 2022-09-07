@@ -1,22 +1,22 @@
 import numpy as np
 
-from RK4 import der_r
-
 class Fields():
     
     def __init__(self, R = 10, N = 110):
         # Domain is a sphere of radius R
+        self.OPL = False
+        
         self.Rmax = R
-        self.N    = N + 1 # 1 is the ghost cell
+        self.N    = N + 2 # 2 is the ghost cell
         
         self.dR  = R / N
     
         self.r = np.array([(j - 0.5)*self.dR for j in range(1,N+1)], dtype = np.float64)
-        
         self.fields = np.zeros(7 * self.N)
-        
         self.psi = 1 + 1 / 4 / self.r  #r_s = 1
-        self.OPL = False
+        
+        self.r = np.insert(self.r, 0, [None, None])
+        self.psi = np.insert(self.psi, 0, [None, None])
         
     def A(self):
         return self.fields[0:self.N]
