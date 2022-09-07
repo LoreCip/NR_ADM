@@ -24,7 +24,8 @@ $$\begin{cases}
 \end{cases}$$
 
 The field $\alpha$ is the lapse function. It follows one of the following evoultion equations:
-$$\partial_t \alpha = \begin{cases}&0\\&-2\alpha K\end{cases}$$
+$$\partial_t \alpha = \begin{cases}&0\\
+&-2\alpha K\end{cases}$$
 The first case correspond to the gauge choice called "Geodesic Slicing", the second to the "1+Log" choice.
 
 Lastly the apparent horizon has been estimated solving the following equation for $r = r_h$:
