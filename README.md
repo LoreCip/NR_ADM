@@ -5,7 +5,7 @@ The aim of this exercise is to simulate the time evolution of the Schwarzschild 
 ![image](Images/EFE_adm.png)
 
 where $A(r,t)$ and $B(r,t)$ are defined such that for a spherically-symmetric system (such as the Schwarzschild spacetime), the spatial part of the metric can be written as
-$$ d\elle^2 = A(r,t) dr^2 + r^2 B(r,t) d\Omega^2$$
+$$ d\ell^2 = A(r,t) dr^2 + r^2 B(r,t) d\Omega^2$$
 
 The fields $D_A$ and $D_B$ are auxiliary variables such that $D_i = \partial_r i$ for $i = A, B$. Lastly $K_i$ are the extrinsic curvature non vanishing components, in particular $K_A = K^r_r$ and $K_B = K^\theta_\theta = K^\phi_\phi$.
 
