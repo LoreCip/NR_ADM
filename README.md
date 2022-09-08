@@ -27,7 +27,7 @@ The field $\alpha$ is the lapse function. It follows one of the following evoult
 $$
 \partial_t \alpha = 
 \begin{cases}
-&0\\
+&0\\\
 &-2\alpha K
 \end{cases}
 $$
