@@ -20,6 +20,7 @@ def find_sgn_change(function, N):
     for i in range(N-1):
         if np.sign(function[i]) != np.sign(function[i+1]):
             break
+    print(i)
     return i
 
 def comp_appHorizon(fields):

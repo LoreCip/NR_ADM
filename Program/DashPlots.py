@@ -28,7 +28,7 @@ def setup(name, N, itmax, r, dR):
     ## RECOVER DATA
     dataH5 = h5py.File(name,'r')
     data = np.zeros((len(dataH5), 7, N-2))
-    for i in range(itmax+1):
+    for i in range(1,itmax+1):
         data[i,:,:] = dataH5[f'{i}']
         
     horizonData = dataH5['Horizon']
@@ -52,17 +52,17 @@ def setup(name, N, itmax, r, dR):
         
         fig = make_subplots(rows=1, cols=4)
         fig.add_trace(
-            go.Scatter(x = horizonData[:,0], y = horizonData[:,1],
+            go.Scatter(x = horizonData[1:,0], y = horizonData[1:,1],
                       line = dict(color = 'SlateGrey', width = 4), name = 'Isotropic Coordinates'),
             row=1, col=2
         )
         fig.add_trace(
-            go.Scatter(x = horizonData[:,0], y = horizonData[:,2],
+            go.Scatter(x = horizonData[1:,0], y = horizonData[1:,2],
                       line = dict(color = 'SteelBlue', width = 4), name = 'Schwarzschild Coordinates'),
             row=1, col=3
             )
         fig.add_trace(
-            go.Scatter(x = horizonData[:,0], y = horizonData[:,3],
+            go.Scatter(x = horizonData[1:,0], y = horizonData[1:,3],
                       line = dict(color = 'Thistle', width = 4), name = 'Surface', ),
             row=1, col=4
             )

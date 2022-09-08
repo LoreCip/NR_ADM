@@ -22,12 +22,16 @@ def progress_bar(current, total, t_med, bar_length=20):
 
     print(f'Progress: [{arrow}{padding}] {int(fraction*100)}% - Est. time left {timedelta(seconds=(total - current)*t_med)}', end=ending)
 
-def main(N = 100, R = 2.5, dt = 0.00001, itmax = 100, OPL = 1, SAVE = 1, SILENT = 0):
+def main(N = 100, R = 2.5, dt = 0.0001, itmax = 100, OPL = 1, SAVE = 1, SILENT = 0):
 	
     if SAVE:
 	    name = f'N{N}_R{R}_t{itmax}.h5'
 	    h5f = h5py.File(name, 'w')
     fields = Fields(R = R, N = N)
+
+    if dt > fields.dR:
+        print(f'Warning: {dt = } > dR = {fields.dR}')
+    
     if not SILENT:
         print('Setting fields initial values.')
     
@@ -37,7 +41,7 @@ def main(N = 100, R = 2.5, dt = 0.00001, itmax = 100, OPL = 1, SAVE = 1, SILENT 
         fields.IC_GeodesicSlicing()
     
     horizons = np.zeros((itmax+1, 4))
-    j = 0
+    j = 1
     t = 0
     t_it = 0
     if not SILENT:
@@ -47,7 +51,7 @@ def main(N = 100, R = 2.5, dt = 0.00001, itmax = 100, OPL = 1, SAVE = 1, SILENT 
         t1 = time()
         fields.fields = np.copy(rk4(fields, dt))
         t += dt
-        
+
         horizons[j,0] = t
         horizons[j,1], horizons[j,3] = comp_appHorizon(fields)
         horizons[j,2] = horizons[j,1] * (1 + 1/4/horizons[j,1])**2
@@ -84,7 +88,7 @@ if __name__ == "__main__":
     params = {
         'points'   : 100,
         'radius'   : 2.5,
-        'time_step': 0.00001,
+        'time_step': 0.0001,
         'iter'     : 100,
         'oplslic'  : 1,
         'savevar'  : 1,
@@ -111,3 +115,7 @@ if __name__ == "__main__":
     main(N = 10, itmax = 3, SAVE = 0, SILENT = 1)
     
     main(*list(params.values()))
+    
+    ## RUIN FOR CONVERGENCE
+    #for n in [1000, 2000, 4000, 8000]:
+    #    main(N = n, R = 10)

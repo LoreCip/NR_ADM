@@ -6,7 +6,6 @@ def ev_A(f0, r, dR, N, OPL):
     al = f0[6*N:7*N]
     A  = f0[0  :  N]
     KA = f0[4*N:5*N]
-    
     return - 2 * al[2:] * A[2:] * KA[2:]
 
 @njit
@@ -23,7 +22,6 @@ def ev_DA(f0, r, dR, N, OPL):
     
     p1 = KA[2:] * d_r(np.log(al), dR)[2:]
     p2 = ghost_derivative(KA, dR)[2:]
-    
     return - 2 * al[2:] * (p1 + p2)
 
 @njit
@@ -52,7 +50,7 @@ def ev_KA(f0, r, dR, N, OPL):
     p2 = Dal[2:]**2 + 0.5 * (- Dal[2:] * DA[2:] + DB[2:]**2 - DA[2:] * DB[2:])
     p3 = - psi[2:]**4 * A[2:] * KA[2:] * (KA[2:] + 2*KB[2:])
     p4 = - (DA[2:] - 2 * DB[2:]) / r[2:]
-    p5 = 4 * d_r(np.log(psi), dR)[2:] + d_r(np.log(psi), dR)[2:] * (2 * DB[2:] - 2 * DA[2:] - 2 * Dal[2:]  + 4 / r[2:])
+    p5 = 4 * d_r(np.log(psi[2:]), dR) + d_r(np.log(psi[2:]), dR) * (2 * DB[2:] - 2 * DA[2:] - 2 * Dal[2:] + 4 / r[2:])
     
     return - al[2:] * (p1 + p2 + p3 + p4 + p5) / (A[2:] * psi[2:]**4)
 
@@ -67,14 +65,14 @@ def ev_KB(f0, r, dR, N, OPL):
     al = f0[6*N:7*N]
     
     psi = 1 + 1 / 4 / r
-    Dal = d_r(np.log(al), dR)
+    Dal = d_r(np.log(al[2:]), dR)
 	
     p1 = ghost_derivative(DB, dR)[2:]
-    p2 = Dal[2:] * DB[2:] + DB[2:]**2 - 0.5 * DA[2:] * DB[2:]
-    p3 = - (DA[2:] - 2 * Dal[2:] - 4 * DB[2:]) / r[2:]
+    p2 = Dal * DB[2:] + DB[2:]**2 - 0.5 * DA[2:] * DB[2:]
+    p3 = - (DA[2:] - 2 * Dal - 4 * DB[2:]) / r[2:]
     p4 = - 2 * (A[2:] - B[2:]) / (B[2:] * r[2:]**2)
     
-    p5 = 4 * d_r(np.log(psi), dR)[2:] + d_r(np.log(psi), dR)[2:] * (8*d_r(np.log(psi), dR)[2:] + 4*Dal[2:] + 6*DB[2:] -2*DA[2:] + 12 / r[2:])
+    p5 = 4 * d_r(np.log(psi[2:]), dR) + d_r(np.log(psi[2:]), dR) * (8*d_r(np.log(psi[2:]), dR) + 4*Dal + 6*DB[2:] -2*DA[2:] + 12 / r[2:])
 	
     p6 = al[2:] * KB[2:] * (KA[2:] + 2 * KB[2:])
     return - 0.5 * al[2:] * (p1 + p2 + p3 + p4 + p5) / (A[2:] * psi[2:]**4) + p6

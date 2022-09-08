@@ -49,7 +49,7 @@ def rk4(fields, dt):
     k3 = RHS(eulerStep(fields, dt, k2, 0.5), fields.r, fields.dR, fields.N, fields.OPL)
     k4 = RHS(eulerStep(fields, dt, k3, 1  ), fields.r, fields.dR, fields.N, fields.OPL)
     out = fields.fields + (k1/6 + k2/3 + k3/3 + k4/6) * dt / 2
-	
+    
     for f in range(7):
          init = f*fields.N
          fin  = (f+1)*fields.N
