@@ -1,17 +1,18 @@
 import numpy as np
-#import mpi4py.MPI as mpi
 
 from time import time
+from datetime import timedelta
+
 import h5py
-import os
 import argparse
 
 from FieldsClass import Fields
 from RK4 import rk4
 from EFE_TR import ghost_derivative
 from Horizon import comp_appHorizon
+from DashPlots import rundash
 
-def progress_bar(current, total, bar_length=20):
+def progress_bar(current, total, t_med, bar_length=20):
     fraction = current / total
 
     arrow = int(fraction * bar_length - 1) * '-' + '>'
@@ -19,15 +20,13 @@ def progress_bar(current, total, bar_length=20):
 
     ending = '\n' if current == total else '\r'
 
-    print(f'Progress: [{arrow}{padding}] {int(fraction*100)}%', end=ending)
+    print(f'Progress: [{arrow}{padding}] {int(fraction*100)}% - Est. time left {timedelta(seconds=(total - current)*t_med)}', end=ending)
 
-def main(N = 100, R = 2.5, dt = 0.0001, itmax = 100, OPL = 1, SAVE = 1, SILENT = 0):
+def main(N = 100, R = 2.5, dt = 0.00001, itmax = 100, OPL = 1, SAVE = 1, SILENT = 0):
 	
     if SAVE:
 	    name = f'N{N}_R{R}_t{itmax}.h5'
 	    h5f = h5py.File(name, 'w')
-    if not SILENT:
-        print(f'Initializing the simulation:\n\t--> Estimated time ???.')
     fields = Fields(R = R, N = N)
     if not SILENT:
         print('Setting fields initial values.')
@@ -61,7 +60,7 @@ def main(N = 100, R = 2.5, dt = 0.0001, itmax = 100, OPL = 1, SAVE = 1, SILENT =
         t_it += time() - t1 
         j += 1
         if not SILENT:
-            progress_bar(j, itmax)
+            progress_bar(j, itmax, t_it/j)
         
     if not SILENT:    
         print(f'Simulation complete. Total elapsed time: {np.round(t_it,4)} s')
@@ -73,17 +72,10 @@ def main(N = 100, R = 2.5, dt = 0.0001, itmax = 100, OPL = 1, SAVE = 1, SILENT =
         h5f.create_dataset(f'Horizon', data=horizons, compression = 9)
         h5f.close()
         
-        comm = f'/mnt/c/"Program Files"/Google/Chrome/Application/chrome.exe http://127.0.0.1:8880/ & python3 DashPlots.py {name} {fields.N} {itmax} {fields.dR}'   
-        os.system(comm)
-        
+        rundash(name, fields.N, itmax, fields.r[2:], fields.dR)
+
     if not SILENT:
         print('')
-        
-        
-    
-    
-
-    
     
     
     
@@ -92,7 +84,7 @@ if __name__ == "__main__":
     params = {
         'points'   : 100,
         'radius'   : 2.5,
-        'time_step': 0.0001,
+        'time_step': 0.00001,
         'iter'     : 100,
         'oplslic'  : 1,
         'savevar'  : 1,
@@ -114,6 +106,8 @@ if __name__ == "__main__":
             params[arg] = getattr(args, arg)
 
     ## This first run is needed to compile Numba
-    #main(N = 10, itmax = 3, SAVE = 0, SILENT = 1)
+    if not params['silentvar']:
+        print(f'Initializing the simulation.')
+    main(N = 10, itmax = 3, SAVE = 0, SILENT = 1)
     
     main(*list(params.values()))

@@ -40,8 +40,7 @@ def RHS(f0, r, dr, N, OPL):
             }
     rhs = np.zeros(7 * N)
     for f in range(7):
-        for i in range(2,N-1): # Salto i 2 ghosts e l'ultimo, che è estrapolato
-            rhs[N * f + i] = func_dict[f](f0, i, r, dr, N, OPL)
+        rhs[N * f + 2 : N * f + N] = func_dict[f](f0, r, dr, N, OPL)
     return rhs
 
 def rk4(fields, dt):

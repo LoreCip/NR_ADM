@@ -2,12 +2,12 @@ import numpy as np
 
 class Fields():
     
-    def __init__(self, R = 10, N = 110):
+    def __init__(self, R = 2.5, N = 100):
         # Domain is a sphere of radius R
         self.OPL = False
         
         self.Rmax = R
-        self.N    = N + 2 # 2 is the ghost cell
+        self.N    = N + 2 # 2 are the ghost cells at the left of each field
         
         self.dR  = R / N
     
