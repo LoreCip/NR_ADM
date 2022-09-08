@@ -25,7 +25,7 @@ The chosen intial conditions are:
 
 The field $\alpha$ is the lapse function. It follows one of the following evoultion equations:
 $\partial_t \alpha = 0$ or $\partial_t \alpha = -2\alpha K$, with $K$ being the mean curvature.
-The first case correspond to the gauge choice called "Geodesic Slicing", the second to the "1+Log" choice.
+The first case correspond to the gauge choice called "Geodesic Slicing", the second to the "1+Log Slicing".
 
 Lastly the apparent horizon has been estimated solving the following equation for $r = r_h$:
 $$\frac{1}{\sqrt{A}} \left(\frac{2}{r} + \frac{\partial_r B}{B}\right) - 2K_B = 0$$
