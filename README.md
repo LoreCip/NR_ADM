@@ -22,8 +22,8 @@ The chosen intial conditions are:
 - $$\alpha = 1$$
 
 The field $\alpha$ is the lapse function. It follows one of the following evoultion equations:
-$$\
-partial_t \alpha = 
+$$
+\partial_t \alpha = 
 \begin{cases}
 &0\\
 &-2\alpha K
