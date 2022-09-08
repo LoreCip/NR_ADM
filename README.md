@@ -11,9 +11,10 @@ The fields $D_A$ and $D_B$ are auxiliary variables such that $D_i = \partial_r i
 
 To avoid eccessive gradients at the origin the following transformation has been applied to those variables:
 
-- $$A \rightarrow \tilde{A} = A/\psi^4, B \rightarrow \tilde{B} = B/\psi^4 \textt{ for } \psi = 1 + \frac{M}{2r}$$
-- $$D_A \rightarrow \tilde{D}_A = D_A - 4\partial_r \log \psi, D_B \rightarrow \tilde{D}_B = D_B - 4\partial_r \log \psi$$,
+- $$A \rightarrow \tilde{A} = A/\psi^4,\quad B \rightarrow \tilde{B} = B/\psi^4 $$
+- $$D_A \rightarrow \tilde{D}_A = D_A - 4\partial_r \log \psi, \quad D_B \rightarrow \tilde{D}_B = D_B - 4\partial_r \log \psi$$,
 
+for $$\psi = 1 + \frac{M}{2r}$$.
 
 The chosen intial conditions are:
 - $$\tilde{A} = \tilde{B} = 1$$
