@@ -2,9 +2,10 @@ import numpy as np
 
 class Fields():
     
-    def __init__(self, R = 2.5, N = 100):
+    def __init__(self, R = 2.5, N = 100, nfields = 8):
         # Domain is a sphere of radius R
         self.OPL = False
+        self.nfields = nfields
         
         self.Rmax = R
         self.N    = N + 2 # 2 are the ghost cells at the left of each field
@@ -12,7 +13,7 @@ class Fields():
         self.dR  = R / N
     
         self.r = np.array([(j - 0.5)*self.dR for j in range(1,N+1)], dtype = np.float64)
-        self.fields = np.zeros(7 * self.N)
+        self.fields = np.zeros(nfields * self.N)
         self.psi = 1 + 1 / 4 / self.r  #r_s = 1
         
         self.r = np.insert(self.r, 0, [None, None])
@@ -32,6 +33,9 @@ class Fields():
         return self.fields[5*self.N:6*self.N]
     def al(self):
         return self.fields[6*self.N:7*self.N]
+    def Dal(self):
+        return self.fields[7*self.N:8*self.N]
+    
     
     def IC_1plusLogSlicing(self):
         """

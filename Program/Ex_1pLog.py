@@ -8,9 +8,9 @@ import argparse
 
 from FieldsClass import Fields
 from RK4 import rk4
-from EFE_TR import ghost_derivative
 from Horizon import comp_appHorizon
 from DashPlots import rundash
+from Constraint import comp_Hconstraint
 
 def progress_bar(current, total, t_med, bar_length=20):
     fraction = current / total
@@ -27,8 +27,10 @@ def main(N = 100, R = 2.5, dt = 0.0001, itmax = 100, OPL = 1, SAVE = 1, SILENT =
     if SAVE:
 	    name = f'N{N}_R{R}_t{itmax}.h5'
 	    h5f = h5py.File(name, 'w')
-    fields = Fields(R = R, N = N)
 
+    fields = Fields(R = R, N = N)
+    horizons = np.zeros((itmax+1, 4))
+    
     if dt > fields.dR:
         print(f'Warning: {dt = } > dR = {fields.dR}')
     
@@ -39,15 +41,14 @@ def main(N = 100, R = 2.5, dt = 0.0001, itmax = 100, OPL = 1, SAVE = 1, SILENT =
         fields.IC_1plusLogSlicing()
     else:
         fields.IC_GeodesicSlicing()
-    
-    horizons = np.zeros((itmax+1, 4))
-    j = 1
+
+    j = 0
     t = 0
     t_it = 0
     if not SILENT:
         print('Performing MoL evolution:')
 
-    while j <= itmax:
+    while j < itmax:
         t1 = time()
         fields.fields = np.copy(rk4(fields, dt))
         t += dt
@@ -57,12 +58,15 @@ def main(N = 100, R = 2.5, dt = 0.0001, itmax = 100, OPL = 1, SAVE = 1, SILENT =
         horizons[j,2] = horizons[j,1] * (1 + 1/4/horizons[j,1])**2
         
         if SAVE:
-            reshaped_output = np.reshape(fields.fields, (7, fields.N))
+            reshaped_output = np.reshape(fields.fields, (fields.nfields, fields.N))
             reshaped_output = np.delete(reshaped_output, [0,1], 1)
             h5f.create_dataset(f'{j}', data=reshaped_output, compression = 9)
             
         t_it += time() - t1 
+        
         j += 1
+        
+        #print(comp_Hconstraint(fields))
         if not SILENT:
             progress_bar(j, itmax, t_it/j)
         
@@ -112,10 +116,10 @@ if __name__ == "__main__":
     ## This first run is needed to compile Numba
     if not params['silentvar']:
         print(f'Initializing the simulation.')
-    main(N = 10, itmax = 3, SAVE = 0, SILENT = 1)
-    
+    #main(N = 10, itmax = 3, SAVE = 0, SILENT = 1)
+
     main(*list(params.values()))
     
-    ## RUIN FOR CONVERGENCE
+    # RUIN FOR CONVERGENCE
     #for n in [1000, 2000, 4000, 8000]:
     #    main(N = n, R = 10)

@@ -19,7 +19,7 @@ def maps(string_val):
 		'A' : 0, 'B' : 1,
 		'DA': 2, 'DB': 3,
 		'KA': 4, 'KB': 5,
-		'alpha': 6
+		'alpha': 6, 'Dalpha':7
 	}
 	return mapps[string_val]
 
@@ -27,12 +27,12 @@ def maps(string_val):
 def setup(name, N, itmax, r, dR):
     ## RECOVER DATA
     dataH5 = h5py.File(name,'r')
-    data = np.zeros((len(dataH5), 7, N-2))
-    for i in range(1,itmax+1):
+    data = np.zeros((len(dataH5), 8, N-2))
+    for i in range(1,itmax):
         data[i,:,:] = dataH5[f'{i}']
         
     horizonData = dataH5['Horizon']
-
+    
     ## SETUP DASH    
     app = dash.Dash()   #initialising dash app
     
@@ -44,8 +44,8 @@ def setup(name, N, itmax, r, dR):
          idG = maps(dropdown_value)
          idT = slider_value
          
-         fig = go.Figure([go.Scatter(x = r, y = data[idT,idG,:], line = dict(color = 'firebrick', width = 4), name = dropdown_value)])
-         fig.update_layout(title = f'Time {idT}', xaxis_title = 'Position')
+         fig = go.Figure([go.Scatter(x = r[r<3], y = data[idT,idG,:][r<3], line = dict(color = 'firebrick', width = 4), name = dropdown_value)])
+         fig.update_layout(title = f'Time {idT}', xaxis_title = 'Position', )
          return fig  
     
     def horizon_plot():
@@ -68,8 +68,7 @@ def setup(name, N, itmax, r, dR):
             )
     
         fig.update_layout(title = f'Horizon', xaxis_title = 'Time')
-        return fig  
-    
+        return fig
     
     ##   PAGE LAYOUT
     children = [
@@ -86,7 +85,8 @@ def setup(name, N, itmax, r, dR):
                            {'label': 'DB', 'value':'DB'},
                            {'label': 'KA', 'value':'KA'},
                            {'label': 'KB', 'value':'KB'},
-                           {'label': r'\alpha', 'value':'alpha'}
+                           {'label': 'al', 'value':'alpha'},
+                           {'label': 'Dal','value':'Dalpha'}
                            ],
                style = {'textAlign':'center', 'marginTop':40,'marginBottom':40}),
         # Plot
@@ -100,7 +100,6 @@ def setup(name, N, itmax, r, dR):
         # Plot
            dcc.Graph(id = 'horizon_plot', figure = horizon_plot())
     ]
-    
     
     ## SETUP DASH
     app.layout = html.Div(id = 'parent', style = {'background-color': 'Beige'}, children = children)

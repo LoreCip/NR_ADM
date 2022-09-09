@@ -8,11 +8,11 @@ def eulerStep(fields, dt, k, fac):
             0: fields.A,  1: fields.B,
             2: fields.DA, 3: fields.DB,
             4: fields.KA, 5: fields.KB,
-            6: fields.al
+            6: fields.al, 7: fields.Dal
                     }
     
-    results = np.zeros(7 * fields.N)
-    for f in range(7):
+    results = np.zeros(fields.nfields * fields.N)
+    for f in range(fields.nfields):
         init = f*fields.N
         fin  = (f+1)*fields.N
         
@@ -31,26 +31,26 @@ def eulerStep(fields, dt, k, fac):
         results[fin-1] = ite(fields.r[-1])
     return results
 
-def RHS(f0, r, dr, N, OPL):
+def RHS(f0, r, dr, N, nfields, OPL):
     func_dict = {
             0: ev_A,  1: ev_B,
             2: ev_DA, 3: ev_DB,
             4: ev_KA, 5: ev_KB,
-            6: ev_al
+            6: ev_al, 7: ev_Dal
             }
-    rhs = np.zeros(7 * N)
-    for f in range(7):
+    rhs = np.zeros(nfields * N)
+    for f in range(nfields):
         rhs[N * f + 2 : N * f + N] = func_dict[f](f0, r, dr, N, OPL)
     return rhs
 
 def rk4(fields, dt):
-    k1 = RHS(fields.fields, fields.r, fields.dR, fields.N, fields.OPL)
-    k2 = RHS(eulerStep(fields, dt, k1, 0.5), fields.r, fields.dR, fields.N, fields.OPL)
-    k3 = RHS(eulerStep(fields, dt, k2, 0.5), fields.r, fields.dR, fields.N, fields.OPL)
-    k4 = RHS(eulerStep(fields, dt, k3, 1  ), fields.r, fields.dR, fields.N, fields.OPL)
+    k1 = RHS(fields.fields, fields.r, fields.dR, fields.N, fields.nfields, fields.OPL)
+    k2 = RHS(eulerStep(fields, dt, k1, 0.5), fields.r, fields.dR, fields.N, fields.nfields, fields.OPL)
+    k3 = RHS(eulerStep(fields, dt, k2, 0.5), fields.r, fields.dR, fields.N, fields.nfields, fields.OPL)
+    k4 = RHS(eulerStep(fields, dt, k3, 1  ), fields.r, fields.dR, fields.N, fields.nfields, fields.OPL)
     out = fields.fields + (k1/6 + k2/3 + k3/3 + k4/6) * dt / 2
     
-    for f in range(7):
+    for f in range(fields.nfields):
          init = f*fields.N
          fin  = (f+1)*fields.N
         # (A)symmetry condition
