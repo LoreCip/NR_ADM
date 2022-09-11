@@ -17,10 +17,8 @@ def comp_Surface(rh, B):
 
 @njit
 def find_sgn_change(function, N):
-    for i in range(N-1):
-        if np.sign(function[i]) != np.sign(function[i+1]):
-            break
-    return i
+    out = np.where(function[:-1] * function[1:] < 0 )[0] +1
+    return out[-1]
 
 def comp_appHorizon(fields):
     
@@ -28,13 +26,13 @@ def comp_appHorizon(fields):
     A = fields.A()[2:] * fields.psi[2:]**4
     B = fields.B()[2:] * fields.psi[2:]**4
     KB = fields.KB()[2:]
-
+    
     function = func(A, B, KB, r, fields.N, fields.dR)
     i = find_sgn_change(function, fields.N)
 
-    pos = [r       [j] for j in [i-1, i, i+1, i+2]]
-    val = [function[j] for j in [i-1, i, i+1, i+2]]
-    Bs  = [B       [j] for j in [i-1, i, i+1, i+2]]
+    pos = [r       [j] for j in [i-2, i-1, i, i+1, i+2]]
+    val = [function[j] for j in [i-2, i-1, i, i+1, i+2]]
+    Bs  = [B       [j] for j in [i-2, i-1, i, i+1, i+2]]
         
     interp  = interp1d(pos, val, kind = 'cubic')
     interpB = interp1d(pos, Bs, kind = 'cubic')

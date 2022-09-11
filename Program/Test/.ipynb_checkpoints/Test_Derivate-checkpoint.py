@@ -7,15 +7,15 @@ from EFE_TR import d_r, d2_r
 
 
 def f(x):
-    return x**9
+    return np.sqrt(x**2 + x)
 
 def fp(x):
-    return 9*x**8
+    return 0.5 * (2*x+1)/(x*x + x)**0.5
 
 def fs(x):
-    return 9*8*x**7
+    return - 1 / (4 * (x*x + x)**1.5)
 
-X, dx = np.linspace(-1, 1, 10000, retstep = True)
+X, dx = np.linspace(1,5, 10000, retstep = True)
 F  = f(X)
 Fp = fp(X)
 Fs = fs(X)

@@ -7,7 +7,7 @@ from EFE_TR import d2_r, d_r
 def RicciScalar(A, B, r, dR):
     p1 = - 2 * d2_r(B, dR) / (A * B) + 0.5 * d_r(B, dR)**2 / (A * B*B)
     p2 = d_r(A, dR) * d_r(B, dR) / (A*A * B) - 6 * d_r(B, dR) / (r * A * B)
-    p3 = 2 * d_r(A, dR) / (r * A*A) - 2 / (r*r * A)
+    p3 = 2 * d_r(A, dR) / (r * A*A) + 2 / (r*r * B) - 2 / (r*r * A)
     return p1 + p2 + p3
 
 @njit

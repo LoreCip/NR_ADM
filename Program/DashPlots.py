@@ -32,6 +32,7 @@ def setup(name, N, itmax, r, dR):
         data[i,:,:] = dataH5[f'{i}']
         
     horizonData = dataH5['Horizon']
+    constrData  = dataH5['HConstr']
     
     ## SETUP DASH    
     app = dash.Dash()   #initialising dash app
@@ -70,6 +71,14 @@ def setup(name, N, itmax, r, dR):
         fig.update_layout(title = f'Horizon', xaxis_title = 'Time')
         return fig
     
+    def constr_plot():
+        
+        fig = make_subplots(rows=1, cols=4)
+        fig = go.Figure([go.Scatter(x = horizonData[1:,0], y = constrData, line = dict(color = 'firebrick', width = 4), name = 'Hamiltonian Constraint')])
+    
+        fig.update_layout(title = f'Hamiltonian Constraint', xaxis_title = 'Time')
+        return fig
+    
     ##   PAGE LAYOUT
     children = [
         # Title
@@ -98,7 +107,9 @@ def setup(name, N, itmax, r, dR):
                        marks=None,
                        tooltip={"placement": "bottom", "always_visible": False}),
         # Plot
-           dcc.Graph(id = 'horizon_plot', figure = horizon_plot())
+           dcc.Graph(id = 'horizon_plot', figure = horizon_plot()),
+        # Plot
+           dcc.Graph(id = 'Constr_plot', figure = constr_plot())
     ]
     
     ## SETUP DASH

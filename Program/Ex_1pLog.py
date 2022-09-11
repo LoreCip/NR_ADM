@@ -29,7 +29,8 @@ def main(N = 100, R = 2.5, dt = 0.0001, itmax = 100, OPL = 1, SAVE = 1, SILENT =
 	    h5f = h5py.File(name, 'w')
 
     fields = Fields(R = R, N = N)
-    horizons = np.zeros((itmax+1, 4))
+    horizons = np.zeros((itmax, 4))
+    Hconstraint = np.zeros((itmax))
     
     if dt > fields.dR:
         print(f'Warning: {dt = } > dR = {fields.dR}')
@@ -57,16 +58,15 @@ def main(N = 100, R = 2.5, dt = 0.0001, itmax = 100, OPL = 1, SAVE = 1, SILENT =
         horizons[j,1], horizons[j,3] = comp_appHorizon(fields)
         horizons[j,2] = horizons[j,1] * (1 + 1/4/horizons[j,1])**2
         
+        Hconstraint[j] = comp_Hconstraint(fields)
+        
         if SAVE:
             reshaped_output = np.reshape(fields.fields, (fields.nfields, fields.N))
             reshaped_output = np.delete(reshaped_output, [0,1], 1)
             h5f.create_dataset(f'{j}', data=reshaped_output, compression = 9)
             
         t_it += time() - t1 
-        
         j += 1
-        
-        #print(comp_Hconstraint(fields))
         if not SILENT:
             progress_bar(j, itmax, t_it/j)
         
@@ -78,6 +78,7 @@ def main(N = 100, R = 2.5, dt = 0.0001, itmax = 100, OPL = 1, SAVE = 1, SILENT =
             print(f'Saving to {name}.')
         
         h5f.create_dataset(f'Horizon', data=horizons, compression = 9)
+        h5f.create_dataset(f'HConstr', data=Hconstraint, compression = 9)
         h5f.close()
         
         rundash(name, fields.N, itmax, fields.r[2:], fields.dR)
