@@ -18,7 +18,7 @@ def eulerStep(fields, dt, k, fac):
         
 		# Central part
         results[init+2:fin-1] = fields_dict[f]()[2:-1] + k[init+2:fin-1] * fac * dt
-        # (A)symmetry condition (ghosts) TRUE????
+        # (A)symmetry condition (ghosts)
         if f == 2 or f == 3:
             results[init+1] = - results[init+2]
             results[init]   = - results[init+3]

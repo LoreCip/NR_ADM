@@ -1,4 +1,5 @@
 import numpy as np
+from numpy.linalg import norm
 from numba import njit
 
 from EFE_TR import d2_r, d_r
@@ -11,8 +12,8 @@ def RicciScalar(A, B, r, dR):
     return p1 + p2 + p3
 
 @njit
-def l2norm(f):
-    return np.sqrt(np.sum(np.power(f,2)))
+def l2norm(f, dR):
+    return np.sqrt(4*np.pi*np.sum(np.power(f,2)*dR))
 
 def comp_Hconstraint(fields):
     
@@ -24,4 +25,5 @@ def comp_Hconstraint(fields):
     
     R = RicciScalar(A, B, r, fields.dR)
     K = KA / A + 2 * KB / (r*r * B)
-    return l2norm(R + K**2 - (KA / A)**2 - 2 * (KB / (r*r * B))**2)
+    C = R + K**2 - (KA / A)**2 - 2 * (KB / (r*r * B))**2
+    return l2norm(C, fields.dR)

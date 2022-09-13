@@ -101,7 +101,9 @@ def ev_Dal(f0, r, dR, N, OPL):
         
         psi = 1 + 1 / 4 / r
         
-        return - 2 * d_r(KA[2:] / (A[2:] * psi[2:]**4) + 2 * KB[2:] / (r[2:]**2 * B[2:] * psi[2:]**4), dR)
+        #return - 2 * d_r(KA[2:] / (A[2:] * psi[2:]**4) + 2 * KB[2:] / (r[2:]**2 * B[2:] * psi[2:]**4), dR)
+        
+        return - 2 * d_r(KA[2:] + 2 * KB[2:], dR)
     else:
         return np.zeros(N)[2:]
 

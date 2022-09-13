@@ -22,15 +22,15 @@ def progress_bar(current, total, t_med, bar_length=20):
 
     print(f'Progress: [{arrow}{padding}] {int(fraction*100)}% - Est. time left {timedelta(seconds=(total - current)*t_med)}', end=ending)
 
-def main(N = 100, R = 2.5, dt = 0.0001, itmax = 100, OPL = 1, SAVE = 1, SILENT = 0):
+def main(N = 100, R = 2.5, dt = 0.0001, itmax = 100, OPL = 1, SAVE = 1, SILENT = 0, outdir = 'Outputs/'):
 	
     if SAVE:
-	    name = f'N{N}_R{R}_t{itmax}.h5'
-	    h5f = h5py.File(name, 'w')
+	    name = f'N{N}_R{R}_t{itmax}_dt{dt}_OPL{OPL}.h5'
+	    h5f = h5py.File(outdir + name, 'w')
 
     fields = Fields(R = R, N = N)
     horizons = np.zeros((itmax, 4))
-    Hconstraint = np.zeros((itmax))
+    Hconstraint = np.zeros((itmax, 2))
     
     if dt > fields.dR:
         print(f'Warning: {dt = } > dR = {fields.dR}')
@@ -58,7 +58,8 @@ def main(N = 100, R = 2.5, dt = 0.0001, itmax = 100, OPL = 1, SAVE = 1, SILENT =
         horizons[j,1], horizons[j,3] = comp_appHorizon(fields)
         horizons[j,2] = horizons[j,1] * (1 + 1/4/horizons[j,1])**2
         
-        Hconstraint[j] = comp_Hconstraint(fields)
+        Hconstraint[j,0] = t
+        Hconstraint[j,1] = comp_Hconstraint(fields)
         
         if SAVE:
             reshaped_output = np.reshape(fields.fields, (fields.nfields, fields.N))
@@ -81,7 +82,7 @@ def main(N = 100, R = 2.5, dt = 0.0001, itmax = 100, OPL = 1, SAVE = 1, SILENT =
         h5f.create_dataset(f'HConstr', data=Hconstraint, compression = 9)
         h5f.close()
         
-        rundash(name, fields.N, itmax, fields.r[2:], fields.dR)
+        #rundash(outdir + name, fields.N, itmax, fields.r[2:], fields.dR)
 
     if not SILENT:
         print('')

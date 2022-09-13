@@ -50,7 +50,7 @@ class Fields():
         self.fields[0:self.N]  = np.ones(self.N)
         self.fields[self.N:2*self.N]  = np.ones(self.N)
         self.fields[6*self.N:7*self.N] = np.ones(self.N)
-        
+        #self.fields[6*self.N:7*self.N] = (1 - 1 / 4 / self.r) / self.psi        
         
     def IC_GeodesicSlicing(self):
         """
