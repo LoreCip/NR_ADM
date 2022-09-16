@@ -17,7 +17,7 @@ def comp_Surface(rh, B):
 
 @njit
 def find_sgn_change(function, N):
-    out = np.where(function[:-1] * function[1:] < 0 )[0] +1
+    out = np.where(function[:-2] * function[2:] < 0 )[0] +1
     return out[-1]
 
 def comp_appHorizon(fields):
